@@ -1,0 +1,12 @@
+Barnamedj while;
+moutaghaire : 
+a,b : tabiaai;
+bidaya
+   c <- 6;
+   b <- 5;
+   madama ( b latousaoui c ) ifaal
+      a <- b;
+      ouktoub("test while");
+   nihaya_madama
+
+nihaya.

@@ -1,0 +1,10 @@
+Barnamedj for;
+moutaghaire : 
+a,b : tabiaai;
+bidaya
+
+   halaka ( tabiaai a <- 1;a<10;a++) ifaal
+	a <- 1;
+   nihaya_halaka
+
+nihaya.

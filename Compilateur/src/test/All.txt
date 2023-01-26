@@ -1,0 +1,23 @@
+Barnamedj All;
+moutaghaire : 
+a,b : tabiaai;
+c : harref;
+h,k : hakiki;
+o : mantiki;
+bidaya
+a<-10*5+3;
+ifaal
+   ida ( a > 2 wa a < 55 ) ifaal
+      halaka ( tabiaai i <- 1;i<10;i++) ifaal
+	ouktoub("Tp compilation");
+      nihaya_halaka   
+   waila 
+      b <- 5;
+      ikraa(c);
+      madama ( b latousaoui c ) ifaal
+          a<-5;
+      nihaya_madama
+   nihaya_ida
+   madama ( b latousaoui c ) ;
+
+nihaya.

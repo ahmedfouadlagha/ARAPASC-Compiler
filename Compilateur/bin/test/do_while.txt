@@ -1,0 +1,10 @@
+Barnamedj do_while;
+moutaghaire : 
+a,i,j : tabiaai;
+bidaya
+   c <- 6;
+   b <- 5;
+   aaide 
+      a <- b;
+   madama ( i < 10 ); 
+nihaya.

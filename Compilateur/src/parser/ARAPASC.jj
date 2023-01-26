@@ -1,0 +1,368 @@
+/************************************************************************************
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */options{  static = true;}PARSER_BEGIN(ARAPASC)package parser;
+
+import java.util.*; 
+import java.io.*;
+
+public class ARAPASC{
+  static ArrayList<String> Pascal = new ArrayList<String>(); 
+  static ArrayList<String> C = new ArrayList<String>();   public static void main(String args []) throws IOException,ParseException  {
+    //Saisir le programme ARAPASC 
+	FileInputStream file = new FileInputStream("src/test/All.txt");
+	ARAPASC parser = new ARAPASC(file);
+	parser.Start();
+	//programme pascal
+	File file_PASCAL = new File("src/resultat/PASCAL_programme.pas");
+	
+    try {
+      FileWriter Writer_PASCAL = new FileWriter(file_PASCAL);    
+  	  for(String P:Pascal)    
+    		Writer_PASCAL.write(P);
+    		
+      Writer_PASCAL.close();
+      System.out.println("Le programme a été converti en Pascal.");
+    } catch (IOException e) {
+      System.out.println("Une erreur s'est produite.");
+      e.printStackTrace();
+    }
+    //programme c
+    File file_C = new File("src/resultat/C_programme.c");
+    
+    try {
+      FileWriter Writer_C = new FileWriter(file_C);
+      for(String c:C)    
+    		Writer_C.write(c);
+      
+      Writer_C.close();
+      System.out.println("Le programme a été converti en C.");
+    } catch (IOException e) {
+      System.out.println("Une erreur s'est produite.");
+      e.printStackTrace();
+    }
+	file.close();
+  }}PARSER_END(ARAPASC)
+SKIP : {
+  " "
+| "\t"
+| "\n"
+| "\r"
+| < "//" (~[ "\n", "\r" ])* ( "\n" | "\r" | "\r\n" ) >
+| < "/*" (~[ "*" ])* "*" ( ~[ "/" ] (~[ "*" ])* "*" )* "/" >
+}
+
+TOKEN : /* LITERALS */
+{
+  < INTEGER_LITERAL : < DECIMAL_LITERAL >   >
+| < FLOAT_LITERAL : (< INTEGER_LITERAL >)+( "." (< INTEGER_LITERAL >)+)? >
+| < #DECIMAL_LITERAL : ["1"-"9"] (["0"-"9"])* | "0" >
+}
+
+TOKEN : /* KEYWORDS */
+{
+    < BARNAMEDJ : "Barnamedj">
+  | < MOUTAGHAIRE : "moutaghaire" >
+  | < BIDAYA : "bidaya" >
+  | < NIHAYA : "nihaya" >
+  | < INT : "tabiaai">
+  | < BOOLEAN :"mantiki" >
+  | < FLOAT :"hakiki" >
+  | < CHAR:"harref" >
+  | < IF:"ida">
+  | < ELSE:"waila" >
+  | < BREAK:"kherouj" >
+  | < CONTINUE:"akmil" >
+  | < ENDIF:"nihaya_ida" >  
+  | < DO:"ifaal" >
+  | < REAPEAT:"aaide" >
+  | < WHILE:"madama" >
+  | < ENDWHILE:"nihaya_madama" >
+  | < FOR:"halaka" >
+  | < ENDFOR:"nihaya_halaka" > 
+  | < PROCEDURE:"dala" >
+  | < RETURN:"irjaa" >
+  | < VOID : "lachaye" >
+  | < OUKTOUB : "ouktoub" >
+  | < IKRAA : "ikraa" >
+}
+
+TOKEN : /* OPERATOR */
+{
+  	< ADD:"+"> 
+  | < MIN:"-">
+  | < MUL:"*">
+  | < DIV:"/">
+  | < MODULO:"%" >
+  | < ASSIGN:"<-">
+  | < ADDONE:"++" >
+  | < MINUTEONE:"--" >
+}
+
+TOKEN : /* RELATION */
+{
+	< LT:"<"  >
+  | < LE:"<=" >
+  | < GT:">"  >
+  | < GE:">=" >
+  | < EQ:"tousaoui" >
+  | < NE:"latousaoui" >
+   /* LOGICAL */
+  | < AND:"wa" >
+  | < OR:"aw" >
+  | < NOT:"la" >
+}
+
+TOKEN : /* IDENTIFIERS */
+{
+  < IDENTIFIER : < LETTER > ( < LETTER > | < DIGIT > )* >
+  | < #LETTER : [ "_", "a"-"z", "A"-"Z" ] >
+  | < #DIGIT : [ "0"-"9" ] >
+}
+
+TOKEN:/* SEPARATER */
+{
+    <LC:"(">
+  | <RC:")">
+  | <LM:"[">
+  | <RM:"]">
+  | <LB:"{">
+  | <RB:"}">
+  | < COMMA:"," >
+  | < POINTVERGULE:";" >
+  | < DEUXPOINT:":" >
+  | < POINT: "." >
+  | < GUILLEMET : "\"" >
+}
+
+TOKEN : /* MESSAGES */
+{
+  < MESSAGE :  < GUILLEMET > < STRING > ( < STRING > )* < GUILLEMET > >
+| < #STRING : ~[ ] >
+
+}
+
+//analyseur syntaxiquevoid Start() :
+{ }{  program() <EOF>}
+void program() : {Token t;}
+{
+  < BARNAMEDJ > t = < IDENTIFIER > < POINTVERGULE >
+  { Pascal.add("program  "+t.toString()+";\n"); } { C.add("#include <iostream>\nusing namespace std;\nint main(){\n "); }  declaration()
+  < BIDAYA > { Pascal.add("begin\n"); }
+  (
+    Statement()
+  )*
+  < NIHAYA > < POINT > { Pascal.add("\nend."); } { C.add(" \nreturn 0; }"); }
+}
+
+void declaration() : {Token t1,t2; ArrayList<String> C_ident = new ArrayList<String>();}
+{
+  < MOUTAGHAIRE > < DEUXPOINT > { Pascal.add("Var :\n"); }
+  (
+    t1 = < IDENTIFIER > { Pascal.add(t1.toString()); C_ident.add(t1.toString()); }
+    (
+      < COMMA > t2 = < IDENTIFIER > { Pascal.add(","+t2.toString()); C_ident.add(","+t2.toString());}
+    )*
+    < DEUXPOINT > { Pascal.add(" : "); } type ()
+    < POINTVERGULE > { Pascal.add(";\n");C.addAll(C_ident); C.add(";\n"); C_ident.clear(); }
+  )*
+}
+
+void type() :
+{}
+{
+    < INT > { Pascal.add("integer "); C.add("int "); }
+  | < BOOLEAN > { Pascal.add("boolean "); C.add("bool "); }
+  | < FLOAT > { Pascal.add("real "); C.add("float "); }
+  | < CHAR > { Pascal.add("char "); C.add("char "); }
+}
+
+void Statement() :
+{}
+{
+  SequenceStatement() | ConditionalStatements() | LoopStatement() | ReadStatement() | WriteStatement()
+}
+
+void ReadStatement() : { Token t15,t16; }
+{
+  < IKRAA > <LC>  t15 = <IDENTIFIER> { Pascal.add("Read ("+t15.toString()); C.add("cin >> "+t15.toString()); }
+  (
+    < COMMA > t16 =<IDENTIFIER> { Pascal.add(","+t16.toString()); C.add(" >> "+t16.toString()); }
+  )*
+   <RC> < POINTVERGULE >  { Pascal.add(");"); C.add(" >> endl;\n"); }
+  (    Statement()
+  )*
+}
+
+void WriteStatement() : { Token t18,t19;} 
+{
+  < OUKTOUB > <LC>
+  (
+    t18 = <  MESSAGE > { Pascal.add("Write ("+t18.toString()); C.add("cout << "+t18.toString()); } 
+  | t19 = <IDENTIFIER> { Pascal.add("Write ("+t19.toString()); C.add("cout << "+t19.toString()); }
+  
+  )
+
+  (
+    < COMMA >
+    (
+      t18 = <  MESSAGE > { Pascal.add(","+t18.toString()); C.add(" << "+t18.toString()); }
+   	| t19 = <IDENTIFIER> { Pascal.add(","+t19.toString()); C.add(" << "+t19.toString()); }
+
+   	)
+
+  )*
+  
+  <RC> < POINTVERGULE > { Pascal.add(");\n"); C.add(" << endl ;\n"); }
+  (    Statement()
+  )*
+   
+}
+
+void SequenceStatement() : {Token t3;}
+{  
+   (
+     statement() | t3 = <IDENTIFIER> { Pascal.add(t3.toString()); C.add(t3.toString());}  assignment()
+   
+   )
+   < POINTVERGULE > { Pascal.add(";\n"); C.add(";\n"); }
+}
+
+void statement() : { Token t4,t5,t6,t7,t8,t9;}
+{
+	type() t9 = <IDENTIFIER> { Pascal.add(t9.toString()); C.add(t9.toString()); }
+   (
+      <ASSIGN> { Pascal.add(" := "); C.add(" = "); }
+     (
+       	  t4  = <INTEGER_LITERAL> { Pascal.add(t4.toString()); C.add(t4.toString());}
+   	 	| t5 = <FLOAT_LITERAL> { Pascal.add(t5.toString()); C.add(t5.toString()); }
+   	 )
+
+   )?
+   (
+     <COMMA> t6 = <IDENTIFIER> { Pascal.add("," + t6.toString()); C.add("," + t6.toString()); }
+     (
+       <ASSIGN> { Pascal.add(":="); C.add("="); }
+       (
+          t7 =  <INTEGER_LITERAL> { Pascal.add(t7.toString()); C.add(t7.toString()); }
+   		| t8 = <FLOAT_LITERAL> { Pascal.add(t8.toString()); C.add(t8.toString()); }
+
+   	   )
+   	 )?
+   )*
+}
+void assignment() :
+{ }
+{
+   <ASSIGN> { Pascal.add(":="); C.add(" = "); } Expression()
+}
+
+void Expression() :
+{ }
+{
+  AdditiveExpression()
+}
+
+void AdditiveExpression() :
+{ }
+{
+  MultiplicativeExpression()
+  (
+    (
+      <ADD> { Pascal.add("+"); C.add("+"); } | <MIN> { Pascal.add("-"); C.add("-"); }
+    )
+    MultiplicativeExpression()
+  )*
+}
+
+void MultiplicativeExpression() : { }
+{
+  UnaryExpression()
+  (
+    (
+      <MUL> { Pascal.add("*"); C.add("*"); } | <DIV> { Pascal.add("/");C.add("/"); } | <MODULO> { Pascal.add("%"); C.add("%"); }
+    )
+    UnaryExpression()
+  )*
+}
+
+void UnaryExpression() : { Token t9,t10,t11; }
+{
+  	t9 = <INTEGER_LITERAL> { Pascal.add(t9.toString()); C.add(t9.toString()); }
+|	t10 = <FLOAT_LITERAL> { Pascal.add(t10.toString()); C.add(t10.toString()); }
+|	t11 = <IDENTIFIER> { Pascal.add(t11.toString()); C.add(t11.toString()); }
+}
+
+void ConditionalStatements() : { }
+{
+  <IF> <LC> { Pascal.add("if ("); C.add("if ("); } Logiccondition() <RC> < DO > { Pascal.add(") do \n "); C.add(") { \n "); }
+      (      Statement())*
+  
+  (
+    <ELSE> { Pascal.add("else\n"); C.add("\n} else{ \n"); } (Statement())*
+  )?
+  < ENDIF > { Pascal.add("end;\n"); C.add(" }\n"); }
+}
+
+void Logiccondition() : { }
+{
+  Condition() ( Logic() Logiccondition() )?
+}
+void Logic() : { }
+{
+  <AND> { Pascal.add(" and "); C.add(" && "); } | <OR> { Pascal.add(" or ");C.add(" || "); } | <NOT> { Pascal.add(" not ");C.add(" ! "); }
+}
+
+void Condition() : { }
+{
+  Expression() ( Relationship() Expression() )?
+}
+
+void Relationship() : { }
+{
+  (
+    <GT> { Pascal.add(" > "); C.add(" > "); }
+  | <LT> { Pascal.add(" < "); C.add(" < "); }
+  | <GE> { Pascal.add(" >= "); C.add(" >= "); }
+  | <LE> { Pascal.add(" <= "); C.add(" <= ");}
+  | <NE> { Pascal.add(" <> "); C.add(" != "); }
+  | <EQ> { Pascal.add(" = "); C.add(" == ");}
+
+  )
+}
+
+void LoopStatement() : { }
+{
+    (
+      <WHILE> <LC> { Pascal.add("while ( "); C.add(" while ( "); } Logiccondition() <RC> { Pascal.add(" ) do\nbegin"); C.add(" ) { \n"); } < DO >
+       (
+  	    Statement())*
+      <ENDWHILE > { Pascal.add("end;\n"); C.add(" } ");}
+    )
+|
+	(
+	  <DO> { Pascal.add("repeat\n"); C.add(" do { \n "); }
+	   
+  	    Statement()
+	  <WHILE> <LC> { Pascal.add("\nuntil ( "); C.add(" } while ( "); } Logiccondition() <RC> <POINTVERGULE> { Pascal.add(" );\n"); C.add(" );\n"); }
+	)	
+|
+	(
+	  <FOR> <LC> { Pascal.add("for ( "); C.add("for ( "); } statement() <POINTVERGULE> { Pascal.add(";"); C.add(";"); }
+	  Logiccondition() <POINTVERGULE> { Pascal.add(";"); C.add(";"); }
+	  crease() <RC> <DO> { Pascal.add(")\n"); C.add(") { \n"); }
+  	  (  	    Statement())*
+  	  < ENDFOR > { Pascal.add("end;\n"); C.add(" }\n"); }
+  	)
+}
+
+void crease() : { Token t12;}
+{
+  t12 = <IDENTIFIER> { Pascal.add(t12.toString()); C.add(t12.toString()); }
+  (
+    <ADDONE> { Pascal.add("++"); C.add("++"); }
+  | <MINUTEONE> { Pascal.add("--"); C.add("--"); }
+
+  )?
+}
+
+	

@@ -1,0 +1,15 @@
+Barnamedj if_else;
+moutaghaire : 
+a,b : tabiaai;
+bidaya
+
+   ida ( a > 5 ) ifaal
+      a<-3;
+      ouktoub("Tp compilation");
+   waila 
+      b <- 5;
+      ikraa(a);
+
+   nihaya_ida
+
+nihaya.
